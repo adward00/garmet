@@ -1,9 +1,8 @@
-import warnings
-warnings.filterwarnings("ignore", category=DeprecationWarning)
-
+#garmet_main_window
 from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QTableWidget, QTableWidgetItem, \
-    QLabel, QLineEdit, QPushButton, QMessageBox
+    QLabel, QLineEdit, QPushButton, QMessageBox, QDialog, QFormLayout
 from garmet_helper import DB, DB_CONFIG
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -16,16 +15,14 @@ class MainWindow(QMainWindow):
         vbox = QVBoxLayout(central)
 
         # 입력폼
-        form_box = QHBoxLayout()
+        form_box = QVBoxLayout()
         self.input_Numbers = QLineEdit()
         self.input_sort = QLineEdit()
         self.input_size = QLineEdit()
         self.input_price = QLineEdit()
         self.input_stock = QLineEdit()
-        self.btn_add = QPushButton("추가")
-        self.btn_add.clicked.connect(self.add_garmet)
 
-       
+    
         form_box.addWidget(QLabel("번호"))
         form_box.addWidget(self.input_Numbers)
         form_box.addWidget(QLabel("종류"))
@@ -36,7 +33,22 @@ class MainWindow(QMainWindow):
         form_box.addWidget(self.input_price)
         form_box.addWidget(QLabel("재고"))
         form_box.addWidget(self.input_stock)
+        
+
+
+        self.btn_add = QPushButton("추가")
+        self.btn_add.clicked.connect(self.add_garmet)
         form_box.addWidget(self.btn_add)
+       
+        self.btn_add = QPushButton("삭제")
+        self.btn_add.clicked.connect(self.delete_garmet)
+        form_box.addWidget(self.btn_add)
+
+        self.btn_add = QPushButton("수정")
+        self.btn_add.clicked.connect(self.corrcet_garmet)
+        form_box.addWidget(self.btn_add)
+
+
 
         # 테이블
         self.table = QTableWidget()
@@ -68,7 +80,7 @@ class MainWindow(QMainWindow):
         Price = self.input_price.text().strip()
         Stock = self.input_stock.text().strip()
 
-        if not (Numbers or Sort or Size or Price or Stock):
+        if not (Numbers and Sort and Size and Price and Stock):
             QMessageBox.warning(self, "오류", "번호, 종류, 사이즈, 가격, 재고를 모두 입력하세요.")
             return
         ok = self.db.insert_stock(Numbers, Sort, Size, Price, Stock)
@@ -83,3 +95,55 @@ class MainWindow(QMainWindow):
             self.load_stock()
         else:
             QMessageBox.critical(self, "실패", "추가 중 오류가 발생했습니다.")
+
+    def delete_garmet(self) :
+        Numbers = self.input_Numbers.text().strip()
+
+        if not (Numbers):
+            QMessageBox.warning(self, "오류", "번호를 입력하세요.")
+            return
+        ok = self.db.delete_garmet(Numbers)
+        if ok:
+            QMessageBox.information(self, "완료", "삭제되었습니다.")
+            self.input_Numbers.clear()
+            self.input_sort.clear()
+            self.input_size.clear()
+            self.input_price.clear()
+            self.input_stock.clear()
+            
+            self.load_stock()
+        else:
+            QMessageBox.critical(self, "실패", "삭제 중 오류가 발생했습니다.")
+
+
+    def corrcet_garmet(self) :
+        Numbers = self.input_Numbers.text().strip()
+        Sort = self.input_sort.text().strip()
+        Size = self.input_size.text().strip()
+        Price = self.input_price.text().strip()
+        Stock = self.input_stock.text().strip()
+
+        if not (Numbers, Sort, Size, Price, Stock):
+            QMessageBox.warning(self, "오류", "모두 입력하세요.")
+            return
+        ok = self.db.corrcet_garmet(Numbers, Sort, Size, Price, Stock)
+        if ok:
+            QMessageBox.information(self, "완료", "수정되었습니다.")
+            self.input_Numbers.clear()
+            self.input_sort.clear()
+            self.input_size.clear()
+            self.input_price.clear()
+            self.input_stock.clear()
+            
+            self.load_stock()
+        else:
+            QMessageBox.critical(self, "실패", "수정 중 오류가 발생했습니다.")       
+           
+
+
+
+          
+       
+
+    
+    

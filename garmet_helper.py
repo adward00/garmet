@@ -1,4 +1,4 @@
-
+#garmet_helper.py
 import pymysql
 
 DB_CONFIG = dict(
@@ -34,3 +34,28 @@ class DB:
             except Exception:
                 conn.rollback()
                 return False        
+            
+    def delete_garmet(self, Numbers):
+        sql = "DELETE FROM stock WHERE Numbers=%s"
+        with self.connect() as conn:
+            try:
+                with conn.cursor() as cur:
+                    cur.execute(sql, (Numbers,))
+                conn.commit()
+                return True
+            except Exception:
+                conn.rollback()
+                return False 
+   
+    def corrcet_garmet(self, Numbers, Sort, Size, Price, Stock):
+        sql = "UPDATE stock SET Numbers=%s, Sort=%s, Size=%s, Price=%s WHERE Stock=%s"
+        with self.connect() as conn:
+            try:
+                with conn.cursor() as cur:
+                    cur.execute(sql, (Numbers, Sort, Size, Price, Stock))
+                conn.commit()
+                return True
+            except Exception:
+                conn.rollback()
+                return False         
+               
